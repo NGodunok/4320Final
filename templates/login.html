@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login{% endblock %}
+
+{% block content %}
+<h2 class="title">Administrator Login</h2>
+<form method="POST">
+    <div class="field">
+        <label class="label">Username</label>
+        <div class="control">
+            <input class="input" type="text" name="username" required>
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">Password</label>
+        <div class="control">
+            <input class="input" type="password" name="password" required>
+        </div>
+    </div>
+    {% if error %}
+        <p class="alert">{{ error }}</p>
+    {% endif %}
+    <div class="control">
+        <button class="button is-danger" type="submit">Login</button>
+    </div>
+</form>
+<p class="mt-4"><a href="{{ url_for('index') }}">Back to Menu</a></p>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Reserve Seat{% endblock %}
+
+{% block content %}
+<h2 class="title">Reserve a Seat</h2>
+<form method="POST">
+    <div class="field">
+        <label class="label">First Name</label>
+        <div class="control">
+            <input class="input" type="text" name="first_name" required>
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">Last Name</label>
+        <div class="control">
+            <input class="input" type="text" name="last_name" required>
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">Seat Row (1-12)</label>
+        <div class="control">
+            <input class="input" type="number" name="seat_row" min="1" max="12" required>
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">Seat Column (0=A, 1=B, 2=C, 3=D)</label>
+        <div class="control">
+            <input class="input" type="number" name="seat_col" min="0" max="3" required>
+        </div>
+    </div>
+    <div class="control">
+        <button class="button is-primary" type="submit">Submit Reservation</button>
+    </div>
+</form>
+<p class="mt-4"><a href="{{ url_for('index') }}">Back to Menu</a></p>
+{% endblock %}

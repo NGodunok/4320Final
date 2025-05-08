@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1 class="title has-text-centered">Welcome to the Reservation System</h1>
+<p class="has-text-centered">Please select an option below to continue:</p>
+
+<div class="has-text-centered" style="margin-top: 30px;">
+    <div class="select is-medium">
+        <select onchange="navigate(this)">
+            <option value="">-- Select a page --</option>
+            <option value="{{ url_for('login') }}">Admin Login</option>
+            <option value="{{ url_for('reservations') }}">View Reservations</option>
+        </select>
+    </div>
+</div>
+
+<script>
+    function navigate(sel) {
+        if (sel.value) {
+            window.location.href = sel.value;
+        }
+    }
+</script>
+{% endblock %}

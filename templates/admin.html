@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<h2 class="title is-3">Admin Dashboard</h2>
+
+<h3 class="title is-4">Seating Chart</h3>
+<table class="table is-bordered is-striped is-narrow is-hoverable">
+  <tbody>
+    {% for row in chart %}
+    <tr>
+      {% for seat in row %}
+      <td class="has-text-centered">{{ seat }}</td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h3 class="title is-4">Total Sales: ${{ total_sales }}</h3>
+
+<h3 class="title is-4">Reservations</h3>
+<table class="table is-fullwidth is-striped">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Seat</th>
+      <th>Reservation Code</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in reservations %}
+    <tr>
+      <td>{{ r.first_name }} {{ r.last_name }}</td>
+      <td>Row {{ r.seat_row }}, Seat {{ r.seat_col }}</td>
+      <td>{{ r.reservation_code }}</td>
+      <td>
+        <form method="POST" action="{{ url_for('delete_reservation', res_id=r.id) }}">
+          <button class="button is-danger is-small">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<a class="button is-link" href="{{ url_for('index') }}">Back to Menu</a>
+{% endblock %}
