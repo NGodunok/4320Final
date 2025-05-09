@@ -24,6 +24,34 @@ def get_reservations():
     conn.close()
     return rows
 
+def generate_chart_and_sales(reservations):
+    chart = [['O' for _ in range(4)] for _ in range(12)]
+    cost_matrix = get_cost_matrix()
+    total_sales = 0
+
+    for r in reservations:
+        row, col = r[2], r[3] 
+        chart[row][col] = 'X'
+        total_sales += cost_matrix[row][col]
+
+    return chart, total_sales
+
+def generate_eticket(name):
+    pattern = "INFOTC4320"
+    result = []
+    name_letters = list(name)
+    pattern_letters = list(pattern)
+
+    # Alternate between name and pattern letters
+    max_len = max(len(name_letters), len(pattern_letters))
+    for i in range(max_len):
+        if i < len(name_letters):
+            result.append(name_letters[i])
+        if i < len(pattern_letters):
+            result.append(pattern_letters[i])
+
+    return ''.join(result)
+
 def get_cost_matrix():
     return [[100, 75, 50, 100] for _ in range(12)]
 
@@ -54,16 +82,7 @@ def admin_dashboard():
         return redirect(url_for('login'))
 
     reservations = get_reservations()
-
-    # Generate 12x4 chart with 'O'
-    chart = [['O' for _ in range(4)] for _ in range(12)]
-    cost_matrix = get_cost_matrix()
-    total_sales = 0
-
-    for r in reservations:
-        row, col = r[3], r[4]  # seat_row, seat_col
-        chart[row - 1][col - 1] = 'X'
-        total_sales += cost_matrix[row - 1][col - 1]
+    chart, total_sales = generate_chart_and_sales(reservations)
 
     return render_template('admin.html', chart=chart, reservations=reservations, total_sales=total_sales)
 
@@ -80,12 +99,38 @@ def delete_reservation(res_id):
 
     return redirect(url_for('admin_dashboard'))
 
-@app.route('/reservations')
+@app.route('/reservations', methods=['GET', 'POST'])
 def reservations():
-    if 'admin' not in session:
-        return redirect(url_for('login'))
-    data = get_reservations()
-    return render_template('reservations.html', reservations=data)
+    error = None
+    success = None
+
+    if request.method == 'POST':
+        passenger_name = request.form['passengerName']
+        seat_row = int(request.form['seatRow']) - 1  # Convert to 0-indexed
+        seat_col = int(request.form['seatColumn'])
+
+        if not (0 <= seat_row < 12 and 0 <= seat_col < 4):
+            error = "Invalid seat selection."
+        else:
+            conn = sqlite3.connect(DB_PATH)
+            cursor = conn.cursor()
+            cursor.execute("SELECT 1 FROM reservations WHERE seatRow=? AND seatColumn=?", (seat_row, seat_col))
+            if cursor.fetchone():
+                error = f"Seat {seat_row + 1}{chr(65 + seat_col)} is already taken."
+            else:
+                eticket = generate_eticket(passenger_name)
+                cursor.execute(
+                    "INSERT INTO reservations (passengerName, seatRow, seatColumn, eTicketNumber) VALUES (?, ?, ?, ?)",
+                    (passenger_name, seat_row, seat_col, eticket)
+                )
+                conn.commit()
+                success = f"Reservation successful! Seat {seat_row + 1}{chr(65 + seat_col)} | eTicket: {eticket}"
+            conn.close()
+
+    reservations = get_reservations()
+    chart, _ = generate_chart_and_sales(reservations)
+
+    return render_template('reservations.html', chart=chart, error=error, success=success)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5008)

@@ -8,30 +8,49 @@
     <div class="field">
         <label class="label">First Name</label>
         <div class="control">
-            <input class="input" type="text" name="first_name" required>
-        </div>
-    </div>
-    <div class="field">
-        <label class="label">Last Name</label>
-        <div class="control">
-            <input class="input" type="text" name="last_name" required>
+            <input class="input" type="text" name="passengerName" required>
         </div>
     </div>
     <div class="field">
         <label class="label">Seat Row (1-12)</label>
         <div class="control">
-            <input class="input" type="number" name="seat_row" min="1" max="12" required>
+            <input class="input" type="number" name="seatRow" min="1" max="12" required>
         </div>
     </div>
     <div class="field">
         <label class="label">Seat Column (0=A, 1=B, 2=C, 3=D)</label>
         <div class="control">
-            <input class="input" type="number" name="seat_col" min="0" max="3" required>
+            <input class="input" type="number" name="seatColumn" min="0" max="3" required>
         </div>
     </div>
     <div class="control">
         <button class="button is-primary" type="submit">Submit Reservation</button>
     </div>
 </form>
+
+{% if success %}
+<div class="notification is-success mt-4">
+    {{ success }}
+</div>
+{% endif %}
+
+{% if error %}
+<div class="notification is-danger mt-4">
+    {{ error }}
+</div>
+{% endif %}
+
 <p class="mt-4"><a href="{{ url_for('index') }}">Back to Menu</a></p>
+<h3 class="title is-4">Seating Chart</h3>
+<table class="table is-bordered is-striped is-narrow is-hoverable">
+  <tbody>
+    {% for row in chart %}
+    <tr>
+      {% for seat in row %}
+      <td class="has-text-centered">{{ seat }}</td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}
